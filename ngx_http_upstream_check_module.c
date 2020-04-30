@@ -2513,7 +2513,13 @@ ngx_http_upstream_check_status_update(ngx_http_upstream_check_peer_t *peer,
     ngx_http_upstream_check_srv_conf_t  *ucscf;
 
     ucscf = peer->conf;
-
+    
+    // Reset counters to limit*5 to avoid coredump
+    if(peer->shm->rise_count > ucscf->rise_count*5)
+        peer->shm->rise_count = ucscf->rise_count;
+    if(peer->shm->fall_count > ucscf->fall_count*5)
+        peer->shm->fall_count = ucscf->fall_count;
+    
     if (result) {
         peer->shm->rise_count++;
         peer->shm->fall_count = 0;
